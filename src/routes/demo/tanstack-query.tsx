@@ -6,16 +6,37 @@ export const Route = createFileRoute("/demo/tanstack-query")({
 });
 
 function TanStackQueryDemo() {
-  const { data } = useQuery({
+  const { data, error, isLoading } = useQuery({
     queryKey: ["todos"],
-    queryFn: () => {
-      return fetch("/api/todos")
-        .then((res) => res.json())
-        .then((data) => data.data.todos);
-    },
+    queryFn: async () => {
+      // Use standard fetch instead of RPC for now
+      const response = await fetch("/api/todos");
+      const result = await response.json();
 
+      if (!result.success) {
+        throw new Error(result.message);
+      }
+
+      return result.data?.todos || [];
+    },
     initialData: [],
   });
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        Loading...
+      </div>
+    );
+  }
+
+  if (error instanceof Error) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        Error: {error.message}
+      </div>
+    );
+  }
 
   return (
     <div
@@ -30,14 +51,15 @@ function TanStackQueryDemo() {
           TanStack Query Simple Promise Handling
         </h1>
         <ul className="mb-4 space-y-2">
-          {data.map((todo) => (
-            <li
-              key={todo.id}
-              className="bg-white/10 border border-white/20 rounded-lg p-3 backdrop-blur-sm shadow-md"
-            >
-              <span className="text-lg text-white">{todo.title}</span>
-            </li>
-          ))}
+          {Array.isArray(data) &&
+            data.map((todo: { id: number; title: string }) => (
+              <li
+                key={todo.id}
+                className="bg-white/10 border border-white/20 rounded-lg p-3 backdrop-blur-sm shadow-md"
+              >
+                <span className="text-lg text-white">{todo.title}</span>
+              </li>
+            ))}
         </ul>
       </div>
     </div>
