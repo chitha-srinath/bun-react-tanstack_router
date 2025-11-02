@@ -1,4 +1,4 @@
-import { StrictMode } from "react";
+import { StrictMode, useMemo } from "react";
 import ReactDOM from "react-dom/client";
 import { RouterProvider, createRouter } from "@tanstack/react-router";
 
@@ -38,13 +38,29 @@ declare module "@tanstack/react-router" {
 const rootElement = document.getElementById("app");
 if (rootElement && !rootElement.innerHTML) {
   const root = ReactDOM.createRoot(rootElement);
-  const authState = useAuthStore.getState();
+
+  // Create a component to handle dynamic auth context updates
+  function App() {
+    const authState = useAuthStore();
+
+    const routerContext = useMemo(
+      () => ({
+        auth: authState,
+        queryClient: TanStackQueryProviderContext.queryClient,
+      }),
+      [authState]
+    );
+
+    return (
+      <TanStackQueryProvider.Provider {...TanStackQueryProviderContext}>
+        <RouterProvider router={router} context={routerContext} />
+      </TanStackQueryProvider.Provider>
+    );
+  }
 
   root.render(
     <StrictMode>
-      <TanStackQueryProvider.Provider {...TanStackQueryProviderContext}>
-        <RouterProvider router={router} context={{ auth: authState }} />
-      </TanStackQueryProvider.Provider>
+      <App />
     </StrictMode>
   );
 }
