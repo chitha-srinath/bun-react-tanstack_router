@@ -1,10 +1,20 @@
-import { Link } from "@tanstack/react-router";
-
+import { Link, useNavigate } from "@tanstack/react-router";
+import { Home, LogIn, LogOut, Menu, Network, X } from "lucide-react";
 import { useState } from "react";
-import { Home, Menu, Network, X } from "lucide-react";
+import { useAuthStore } from "../stores/auth.store";
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const logout = useAuthStore((state) => state.logout);
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    setIsOpen(false);
+    // Navigate to login page after logout
+    navigate({ to: "/login", search: { redirect: "/" } });
+  };
 
   return (
     <>
@@ -74,18 +84,43 @@ export default function Header() {
 
           {/* Demo Links End */}
 
-          <Link
-            to="/home"
-            onClick={() => setIsOpen(false)}
-            className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-800 transition-colors mb-2"
-            activeProps={{
-              className:
-                "flex items-center gap-3 p-3 rounded-lg bg-cyan-600 hover:bg-cyan-700 transition-colors mb-2",
-            }}
-          >
-            <Home size={20} />
-            <span className="font-medium">Dashboard</span>
-          </Link>
+          {isAuthenticated ? (
+            <>
+              <Link
+                to="/home"
+                onClick={() => setIsOpen(false)}
+                className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-800 transition-colors mb-2"
+                activeProps={{
+                  className:
+                    "flex items-center gap-3 p-3 rounded-lg bg-cyan-600 hover:bg-cyan-700 transition-colors mb-2",
+                }}
+              >
+                <Home size={20} />
+                <span className="font-medium">Dashboard</span>
+              </Link>
+              <button
+                onClick={handleLogout}
+                className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-800 transition-colors mb-2 w-full text-left"
+              >
+                <LogOut size={20} />
+                <span className="font-medium">Logout</span>
+              </button>
+            </>
+          ) : (
+            <Link
+              to="/login"
+              search={{ redirect: "/" }}
+              onClick={() => setIsOpen(false)}
+              className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-800 transition-colors mb-2"
+              activeProps={{
+                className:
+                  "flex items-center gap-3 p-3 rounded-lg bg-cyan-600 hover:bg-cyan-700 transition-colors mb-2",
+              }}
+            >
+              <LogIn size={20} />
+              <span className="font-medium">Login</span>
+            </Link>
+          )}
         </nav>
       </aside>
     </>

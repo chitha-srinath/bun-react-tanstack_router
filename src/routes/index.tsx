@@ -1,8 +1,19 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
+import { useAuthStore } from "../stores/auth.store";
 import logo from "../logo.svg";
 
 export const Route = createFileRoute("/")({
   component: App,
+  beforeLoad: async () => {
+    // Check if user is authenticated
+    const isAuthenticated = useAuthStore.getState().isAuthenticated;
+    if (isAuthenticated) {
+      // Redirect to home page if authenticated
+      throw redirect({
+        to: "/home",
+      });
+    }
+  },
 });
 
 function App() {

@@ -7,9 +7,11 @@ import Header from '../components/Header'
 import TanStackQueryDevtools from '../integrations/tanstack-query/devtools'
 
 import type { QueryClient } from '@tanstack/react-query'
+import type { AuthState } from '@/stores/auth.store'
 
 interface MyRouterContext {
-  queryClient: QueryClient
+  queryClient: QueryClient;
+  auth: AuthState;
 }
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
