@@ -1,16 +1,16 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
-  beforeLoad: ({ context, location }) => {
-    if (!context.auth.isAuthenticated) {
-      throw redirect({
-        to: "/login",
-        search: {
-          redirect: location.href,
-        },
-      });
-    }
-  },
+  // beforeLoad: ({ context, location }) => {
+  //   if (!context.auth.isAuthenticated) {
+  //     throw redirect({
+  //       to: "/login",
+  //       search: {
+  //         redirect: location.href,
+  //       },
+  //     });
+  //   }
+  // },
   component: DashboardComponent,
 });
 
@@ -21,12 +21,7 @@ function DashboardComponent() {
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Dashboard</h1>
-        <button
-          onClick={auth.logout}
-          className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
-        >
-          Sign Out
-        </button>
+
       </div>
 
       <div className="bg-white p-6 rounded-lg shadow">

@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import apiFetch from "../lib/api";
 
 interface User {
     id: number;
@@ -15,23 +16,25 @@ export interface AuthState {
     register: (username: string, email: string, password: string) => Promise<boolean>;
     logout: () => void;
     loadUserFromToken: (token: string) => Promise<void>;
+    setToken: (token: string) => void;
+    checkAuth: () => Promise<boolean>;
+    verifyToken: () => Promise<boolean>;
 }
 
 export const useAuthStore = create<AuthState>()(
     persist(
-        (set) => ({
+        (set, get) => ({
             isAuthenticated: false,
             user: null,
             token: null,
 
-            login: async (email, password) => {
+            setToken: (token: string) => set({ token }),
+
+            login: async (email: string, password: string) => {
                 try {
                     // API call to login endpoint
-                    // const response = await fetch("/api/auth/login", {
+                    // const response = await apiFetch("/api/auth/login", {
                     //     method: "POST",
-                    //     headers: {
-                    //         "Content-Type": "application/json",
-                    //     },
                     //     body: JSON.stringify({ email, password }),
                     // });
 
@@ -45,7 +48,7 @@ export const useAuthStore = create<AuthState>()(
                         set({
                             isAuthenticated: true,
                             user: { id: 1, username: "test", email: "test@test.com" },
-                            token: ""
+                            token: "mock_token"
                         });
                         return true;
                     } else {
@@ -57,27 +60,19 @@ export const useAuthStore = create<AuthState>()(
                 }
             },
 
-            register: async (username, email, password) => {
+            register: async (username: string, email: string, password: string) => {
                 try {
                     // API call to register endpoint
-                    const response = await fetch("/api/auth/register", {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                        },
-                        body: JSON.stringify({ username, email, password }),
+                    const response = await apiFetch.post("/api/auth/register", {
+                        username,
+                        email,
+                        password
                     });
-
-                    if (!response.ok) {
-                        throw new Error("Registration failed");
-                    }
-
-                    const data = await response.json();
 
                     set({
                         isAuthenticated: true,
-                        user: data.data.user,
-                        token: data.data.token
+                        user: response.data.data.user,
+                        token: response.data.data.token
                     });
                     return true;
                 } catch (error) {
@@ -88,38 +83,30 @@ export const useAuthStore = create<AuthState>()(
 
             logout: () => {
                 // API call to logout endpoint
-                const token = useAuthStore.getState().token;
-                fetch("/api/auth/logout", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({ token }),
-                }).catch(console.error);
+                const token = get().token;
+                if (token) {
+                    apiFetch.post("/api/auth/logout", { token }).catch(console.error);
+                }
 
                 set({
                     isAuthenticated: false,
                     user: null,
                     token: null
                 });
-                // Removed redirect call - navigation should be handled in components
             },
 
-            loadUserFromToken: async (token) => {
+            loadUserFromToken: async (token: string) => {
                 try {
                     // API call to get current user
-                    const response = await fetch(`/api/auth/me?token=${token}`);
+                    // We set the token in the store first so apiFetch can use it
+                    set({ token });
 
-                    if (!response.ok) {
-                        throw new Error("Failed to load user");
-                    }
-
-                    const data = await response.json();
+                    const response = await apiFetch.get(`/api/auth/me`);
 
                     set({
                         isAuthenticated: true,
-                        user: data.data.user,
-                        token
+                        user: response.data.data.user,
+                        token // Ensure token is set
                     });
                 } catch (error) {
                     console.error("Load user error:", error);
@@ -130,6 +117,48 @@ export const useAuthStore = create<AuthState>()(
                         token: null
                     });
                 }
+            },
+
+            checkAuth: async () => {
+                try {
+                    // Try to refresh token to check if user is authenticated
+                    const response = await fetch("/api/auth/refresh", {
+                        method: "POST",
+                        credentials: "include"
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        const token = data.data.token;
+
+                        set({ token });
+
+                        // Fetch user details
+                        const userResponse = await apiFetch.get("/api/auth/me");
+                        set({
+                            isAuthenticated: true,
+                            user: userResponse.data.data.user,
+                            token
+                        });
+                        return true;
+                    }
+
+                    set({ isAuthenticated: false, user: null, token: null });
+                    return false;
+                } catch (error) {
+                    set({ isAuthenticated: false, user: null, token: null });
+                    return false;
+                }
+            },
+            verifyToken: async () => {
+                try {
+                    const response = await apiFetch.get("/api/auth/verify");
+                    set({ isAuthenticated: true, user: response.data.data.user });
+                    return true;
+                } catch (error) {
+                    set({ isAuthenticated: false, user: null });
+                    return false;
+                }
             }
         }),
         {
@@ -137,7 +166,7 @@ export const useAuthStore = create<AuthState>()(
             partialize: (state) => ({
                 isAuthenticated: state.isAuthenticated,
                 user: state.user,
-                token: state.token
+                // token: state.token // Do not persist token
             }),
         }
     )
