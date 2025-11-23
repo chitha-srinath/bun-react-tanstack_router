@@ -1,10 +1,12 @@
 import { createFileRoute, redirect, Outlet } from "@tanstack/react-router";
 import { useAuthStore } from "@/stores/auth.store";
+import { Loading } from "@/components/Loading";
+import { ErrorComponent } from "@/components/Error";
 
 export const Route = createFileRoute("/_authenticated")({
   beforeLoad: async ({ context, location, search }) => {
     // Check if access-token is present in query params
-    const accessToken = (search as { "access-token"?: string })["access-token"];
+    const accessToken = (search as { "token"?: string })["token"];
 
     if (accessToken) {
       // Verify and load user data from the token
@@ -13,7 +15,7 @@ export const Route = createFileRoute("/_authenticated")({
 
       // Clean up the URL by removing the access-token query param
       const searchParams = new URLSearchParams(location.search);
-      searchParams.delete("access-token");
+      searchParams.delete("token");
       const newSearch = searchParams.toString();
       const newPath = location.pathname + (newSearch ? `?${newSearch}` : "");
 
@@ -36,4 +38,6 @@ export const Route = createFileRoute("/_authenticated")({
     }
   },
   component: () => <Outlet />,
+  pendingComponent: Loading,
+  errorComponent: ErrorComponent,
 });

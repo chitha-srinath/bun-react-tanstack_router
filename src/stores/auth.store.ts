@@ -63,7 +63,7 @@ export const useAuthStore = create<AuthState>()(
             register: async (username: string, email: string, password: string) => {
                 try {
                     // API call to register endpoint
-                    const response = await apiFetch.post("/api/auth/register", {
+                    const response = await apiFetch.post("/auth/register", {
                         username,
                         email,
                         password
@@ -85,7 +85,7 @@ export const useAuthStore = create<AuthState>()(
                 // API call to logout endpoint
                 const token = get().token;
                 if (token) {
-                    apiFetch.post("/api/auth/logout", { token }).catch(console.error);
+                    apiFetch.post("/auth/logout", { token }).catch(console.error);
                 }
 
                 set({
@@ -101,7 +101,7 @@ export const useAuthStore = create<AuthState>()(
                     // We set the token in the store first so apiFetch can use it
                     set({ token });
 
-                    const response = await apiFetch.get(`/api/auth/me`);
+                    const response = await apiFetch.get(`/auth/me`);
 
                     set({
                         isAuthenticated: true,
@@ -122,7 +122,7 @@ export const useAuthStore = create<AuthState>()(
             checkAuth: async () => {
                 try {
                     // Try to refresh token to check if user is authenticated
-                    const response = await fetch("/api/auth/refresh", {
+                    const response = await fetch("/auth/refresh", {
                         method: "POST",
                         credentials: "include"
                     });
@@ -134,7 +134,7 @@ export const useAuthStore = create<AuthState>()(
                         set({ token });
 
                         // Fetch user details
-                        const userResponse = await apiFetch.get("/api/auth/me");
+                        const userResponse = await apiFetch.get("/auth/me");
                         set({
                             isAuthenticated: true,
                             user: userResponse.data.data.user,
@@ -152,7 +152,7 @@ export const useAuthStore = create<AuthState>()(
             },
             verifyToken: async () => {
                 try {
-                    const response = await apiFetch.get("/api/auth/verify");
+                    const response = await apiFetch.get("/auth/verify");
                     set({ isAuthenticated: true, user: response.data.data.user });
                     return true;
                 } catch (error) {
