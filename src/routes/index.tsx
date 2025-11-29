@@ -12,6 +12,14 @@ export const Route = createFileRoute("/")({
       throw redirect({
         to: "/home",
       });
+    } else {
+      // Redirect to login page if not authenticated
+      throw redirect({
+        to: "/login",
+        search: {
+          redirect: undefined,
+        },
+      });
     }
   },
 });
