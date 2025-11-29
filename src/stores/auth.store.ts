@@ -11,9 +11,10 @@ export interface AuthState {
     isAuthenticated: boolean;
     user: User | null;
     token: string | null;
+    isInitializing: boolean;
     login: (email: string, password: string) => Promise<boolean>;
     register: (username: string, email: string, password: string) => Promise<boolean>;
-    logout: () => void;
+    logout: () => Promise<void>;
     loadUserFromToken: (token: string) => Promise<void>;
     setToken: (token: string) => void;
     getAccessToken: () => Promise<boolean>;
@@ -26,6 +27,7 @@ export const useAuthStore = create<AuthState>()(
         isAuthenticated: false,
         user: null,
         token: null,
+        isInitializing: true,
 
         setToken: (token: string) => set({ token }),
 
@@ -70,11 +72,15 @@ export const useAuthStore = create<AuthState>()(
             }
         },
 
-        logout: () => {
+        logout: async () => {
             // API call to logout endpoint
             const token = get().token;
             if (token) {
-                apiFetch.get("/auth/logout").catch(console.error);
+                try {
+                    await apiFetch.get("/auth/logout");
+                } catch (error) {
+                    console.error("Logout error:", error);
+                }
             }
 
             set({
@@ -94,7 +100,7 @@ export const useAuthStore = create<AuthState>()(
 
                 set({
                     isAuthenticated: true,
-                    user: response.data.data.user,
+                    user: response.data.data,
                     token // Ensure token is set
                 });
             } catch (error) {
@@ -113,17 +119,21 @@ export const useAuthStore = create<AuthState>()(
                 // Try to refresh token to check if user is authenticated
                 const response = await apiFetch.get("/auth/access-token");
 
+                // The token is directly in response.data.data
+                const newToken = response.data.data;
+
                 set({
-                    isAuthenticated: true,
-                    user: response.data.data.user,
-                    token: response.data.data.token
+                    token: newToken
                 });
                 // use loadUserFromToken to fetch user details
-                await get().loadUserFromToken(response.data.data.token);
+                await get().loadUserFromToken(newToken);
                 return true;
             } catch (error) {
+                console.error("getAccessToken error:", error);
                 set({ isAuthenticated: false, user: null, token: null });
                 return false;
+            } finally {
+                set({ isInitializing: false });
             }
         },
         verifyToken: async () => {

@@ -9,8 +9,8 @@ export default function Header() {
   const logout = useAuthStore((state) => state.logout);
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
     setIsOpen(false);
     // Navigate to login page after logout
     navigate({ to: "/login", search: { redirect: "/" } });

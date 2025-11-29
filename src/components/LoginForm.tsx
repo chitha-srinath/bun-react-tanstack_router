@@ -1,6 +1,12 @@
 import { useState } from "react";
 import { useNavigate, useSearch } from "@tanstack/react-router";
 import { useAuthStore } from "../stores/auth.store";
+import { Button } from "./ui/Button";
+import { Input } from "./ui/Input";
+import { Label } from "./ui/Label";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "./ui/Card";
+import { Spinner } from "./ui/Spinner";
+import { useGoogleAuth } from "../hooks/useGoogleAuth";
 
 interface LoginFormProps {
   onToggleForm: () => void;
@@ -8,12 +14,15 @@ interface LoginFormProps {
 
 export default function LoginForm({ onToggleForm }: LoginFormProps) {
   const navigate = useNavigate();
-  const search = useSearch({ strict: false }); // Get search params
+  const search = useSearch({ strict: false });
   const login = useAuthStore((state) => state.login);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  // Initialize Google Auth hook to handle redirects if any
+  const { isLoading: isGoogleLoading } = useGoogleAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,10 +32,8 @@ export default function LoginForm({ onToggleForm }: LoginFormProps) {
     try {
       const success = await login(email, password);
       if (success) {
-        // Redirect to the saved location or home page after successful login
         const redirectUrl = (search as { redirect?: string }).redirect;
         if (redirectUrl) {
-          // Use window.location for external redirects or internal navigation
           window.location.href = redirectUrl;
         } else {
           navigate({ to: "/home" });
@@ -42,101 +49,92 @@ export default function LoginForm({ onToggleForm }: LoginFormProps) {
     }
   };
 
+  const handleGoogleLogin = () => {
+    // Redirect to backend Google auth endpoint
+    window.location.href = `${import.meta.env.VITE_API_BASE_URL}/auth/google`;
+  };
+
+  if (isGoogleLoading) {
+    return (
+      <Card className="w-full max-w-md mx-auto">
+        <CardContent className="flex flex-col items-center justify-center py-10">
+          <Spinner className="w-8 h-8 text-primary mb-4" />
+          <p className="text-muted-foreground">Verifying Google login...</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
-    <div className="max-w-md w-full space-y-8 p-10 bg-white rounded-xl shadow-lg">
-      <div>
-        <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-          Sign in to your account
-        </h2>
-      </div>
-      <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-        {error && (
-          <div className="rounded-md bg-red-50 p-4">
-            <div className="text-sm text-red-700">{error}</div>
-          </div>
-        )}
-        <div className="rounded-md shadow-sm space-y-4">
-          <div>
-            <label htmlFor="email-address" className="sr-only">
-              Email address
-            </label>
-            <input
-              id="email-address"
-              name="email"
+    <Card className="w-full max-w-md mx-auto shadow-xl border-none bg-white/80 backdrop-blur-sm">
+      <CardHeader className="space-y-1">
+        <CardTitle className="text-2xl font-bold text-center">Welcome back</CardTitle>
+        <CardDescription className="text-center">
+          Enter your email to sign in to your account
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {error && (
+            <div className="p-3 text-sm text-destructive bg-destructive/10 rounded-md">
+              {error}
+            </div>
+          )}
+          <div className="space-y-2">
+            <Label htmlFor="email">Email</Label>
+            <Input
+              id="email"
               type="email"
-              autoComplete="email"
-              required
+              placeholder="m@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-              placeholder="Email address"
+              required
+              disabled={isLoading}
             />
           </div>
-          <div>
-            <label htmlFor="password" className="sr-only">
-              Password
-            </label>
-            <input
+          <div className="space-y-2">
+            <Label htmlFor="password">Password</Label>
+            <Input
               id="password"
-              name="password"
               type="password"
-              autoComplete="current-password"
-              required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-              placeholder="Password"
+              required
+              disabled={isLoading}
             />
           </div>
-        </div>
+          <Button type="submit" className="w-full" disabled={isLoading}>
+            {isLoading && <Spinner className="mr-2 h-4 w-4" />}
+            Sign In
+          </Button>
+        </form>
 
-        <div className="flex items-center justify-between">
-          <div className="flex items-center">
-            <input
-              id="remember-me"
-              name="remember-me"
-              type="checkbox"
-              className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-            />
-            <label
-              htmlFor="remember-me"
-              className="ml-2 block text-sm text-gray-900"
-            >
-              Remember me
-            </label>
+        <div className="relative my-4">
+          <div className="absolute inset-0 flex items-center">
+            <span className="w-full border-t" />
           </div>
-
-          <div className="text-sm">
-            <a
-              href="#"
-              className="font-medium text-indigo-600 hover:text-indigo-500"
-            >
-              Forgot your password?
-            </a>
+          <div className="relative flex justify-center text-xs uppercase">
+            <span className="bg-background px-2 text-muted-foreground">
+              Or continue with
+            </span>
           </div>
         </div>
 
-        <div>
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
-          >
-            {isLoading ? "Signing in..." : "Sign in"}
-          </button>
-        </div>
-      </form>
-      <div className="text-sm text-center">
-        <p className="text-gray-600">
+        <Button variant="outline" type="button" className="w-full" onClick={handleGoogleLogin} disabled={isLoading}>
+          <svg className="mr-2 h-4 w-4" aria-hidden="true" focusable="false" data-prefix="fab" data-icon="google" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 488 512">
+            <path fill="currentColor" d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 123 24.5 166.3 64.9l-67.5 64.9C258.5 52.6 94.3 116.6 94.3 256c0 86.5 69.1 156.6 153.7 156.6 98.2 0 135-70.4 140.8-106.9H248v-85.3h236.1c2.3 12.7 3.9 24.9 3.9 41.4z"></path>
+          </svg>
+          Google
+        </Button>
+      </CardContent>
+      <CardFooter className="flex flex-col space-y-2">
+        <div className="text-sm text-center text-muted-foreground">
           Don't have an account?{" "}
-          <button
-            onClick={onToggleForm}
-            className="font-medium text-indigo-600 hover:text-indigo-500"
-          >
+          <Button variant="link" className="p-0 h-auto font-normal" onClick={onToggleForm}>
             Sign up
-          </button>
-        </p>
-      </div>
-    </div>
+          </Button>
+        </div>
+      </CardFooter>
+    </Card>
   );
 }

@@ -14,18 +14,26 @@ const api = axios.create({
 
 // Request interceptor - Add auth token to requests
 api.interceptors.request.use(async (config) => {
-    const { token } = useAuthStore.getState();
+    let { token } = useAuthStore.getState();
 
-    if (!token) {
-        return config;
+    if (token) {
+        try {
+            const decodedToken = jwtDecode<{ exp: number }>(token);
+            // check 30 second buffer to refresh before actual expiration
+            const isExpired = dayjs.unix(decodedToken.exp).diff(dayjs()) < 30000;
+
+            if (isExpired) {
+                await useAuthStore.getState().getAccessToken();
+                // Get the new token after refresh
+                token = useAuthStore.getState().token;
+            }
+            if (token) {
+                config.headers.Authorization = `Bearer ${token}`;
+            }
+        } catch (error) {
+            console.error("Error in interceptor:", error);
+        }
     }
-    const decodedToken = jwtDecode<{ exp: number }>(token);
-    // check 30 second buffer to refresh before actual expiration
-    const isExpired = dayjs.unix(decodedToken.exp).diff(dayjs()) < 30000;
-    if (isExpired) {
-        await useAuthStore.getState().getAccessToken();
-    }
-    config.headers.Authorization = `Bearer ${token}`;
 
     return config;
 });

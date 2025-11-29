@@ -1,6 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { useAuthStore } from "../stores/auth.store";
+import { Button } from "./ui/Button";
+import { Input } from "./ui/Input";
+import { Label } from "./ui/Label";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "./ui/Card";
+import { Spinner } from "./ui/Spinner";
 
 interface RegisterFormProps {
   onToggleForm: () => void;
@@ -19,7 +24,6 @@ export default function RegisterForm({ onToggleForm }: RegisterFormProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Basic validation
     if (password !== confirmPassword) {
       setError("Passwords do not match");
       return;
@@ -36,7 +40,6 @@ export default function RegisterForm({ onToggleForm }: RegisterFormProps) {
     try {
       const success = await register(username, email, password);
       if (success) {
-        // Redirect to home page after successful registration
         navigate({ to: "/home" });
       } else {
         setError("Registration failed. Please try again.");
@@ -50,103 +53,80 @@ export default function RegisterForm({ onToggleForm }: RegisterFormProps) {
   };
 
   return (
-    <div className="max-w-md w-full space-y-8 p-10 bg-white rounded-xl shadow-lg">
-      <div>
-        <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-          Create your account
-        </h2>
-      </div>
-      <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-        {error && (
-          <div className="rounded-md bg-red-50 p-4">
-            <div className="text-sm text-red-700">{error}</div>
-          </div>
-        )}
-        <div className="rounded-md shadow-sm space-y-4">
-          <div>
-            <label htmlFor="username" className="sr-only">
-              Username
-            </label>
-            <input
+    <Card className="w-full max-w-md mx-auto shadow-xl border-none bg-white/80 backdrop-blur-sm">
+      <CardHeader className="space-y-1">
+        <CardTitle className="text-2xl font-bold text-center">Create an account</CardTitle>
+        <CardDescription className="text-center">
+          Enter your details below to create your account
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {error && (
+            <div className="p-3 text-sm text-destructive bg-destructive/10 rounded-md">
+              {error}
+            </div>
+          )}
+          <div className="space-y-2">
+            <Label htmlFor="username">Username</Label>
+            <Input
               id="username"
-              name="username"
               type="text"
-              required
+              placeholder="johndoe"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-              placeholder="Username"
+              required
+              disabled={isLoading}
             />
           </div>
-          <div>
-            <label htmlFor="email-address" className="sr-only">
-              Email address
-            </label>
-            <input
-              id="email-address"
-              name="email"
+          <div className="space-y-2">
+            <Label htmlFor="email">Email</Label>
+            <Input
+              id="email"
               type="email"
-              autoComplete="email"
-              required
+              placeholder="m@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-              placeholder="Email address"
+              required
+              disabled={isLoading}
             />
           </div>
-          <div>
-            <label htmlFor="password" className="sr-only">
-              Password
-            </label>
-            <input
+          <div className="space-y-2">
+            <Label htmlFor="password">Password</Label>
+            <Input
               id="password"
-              name="password"
               type="password"
-              required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-              placeholder="Password"
+              required
+              disabled={isLoading}
             />
           </div>
-          <div>
-            <label htmlFor="confirm-password" className="sr-only">
-              Confirm Password
-            </label>
-            <input
+          <div className="space-y-2">
+            <Label htmlFor="confirm-password">Confirm Password</Label>
+            <Input
               id="confirm-password"
-              name="confirm-password"
               type="password"
-              required
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-              placeholder="Confirm Password"
+              required
+              disabled={isLoading}
             />
           </div>
-        </div>
-
-        <div>
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
-          >
-            {isLoading ? "Creating account..." : "Sign up"}
-          </button>
-        </div>
-      </form>
-      <div className="text-sm text-center">
-        <p className="text-gray-600">
+          <Button type="submit" className="w-full" disabled={isLoading}>
+            {isLoading && <Spinner className="mr-2 h-4 w-4" />}
+            Sign Up
+          </Button>
+        </form>
+      </CardContent>
+      <CardFooter className="flex flex-col space-y-2">
+        <div className="text-sm text-center text-muted-foreground">
           Already have an account?{" "}
-          <button
-            onClick={onToggleForm}
-            className="font-medium text-indigo-600 hover:text-indigo-500"
-          >
+          <Button variant="link" className="p-0 h-auto font-normal" onClick={onToggleForm}>
             Sign in
-          </button>
-        </p>
-      </div>
-    </div>
+          </Button>
+        </div>
+      </CardFooter>
+    </Card>
   );
 }

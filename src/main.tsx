@@ -1,4 +1,4 @@
-import { StrictMode, useMemo } from "react";
+import { StrictMode, useMemo, useEffect } from "react";
 import ReactDOM from "react-dom/client";
 import { RouterProvider, createRouter } from "@tanstack/react-router";
 
@@ -11,6 +11,7 @@ import "./styles.css";
 import reportWebVitals from "./reportWebVitals.ts";
 import type { AuthState } from "./stores/auth.store.ts";
 import { useAuthStore } from "./stores/auth.store.ts";
+import { Loading } from "./components/Loading";
 
 // Create a new router instance
 
@@ -43,6 +44,11 @@ if (rootElement && !rootElement.innerHTML) {
   function App() {
     const authState = useAuthStore();
 
+    useEffect(() => {
+      // Check for session on mount
+      authState.getAccessToken();
+    }, []);
+
     const routerContext = useMemo(
       () => ({
         auth: authState,
@@ -50,6 +56,17 @@ if (rootElement && !rootElement.innerHTML) {
       }),
       [authState]
     );
+
+    if (authState.isInitializing) {
+      return <Loading />;
+    }
+
+    // Attempt to restore session on mount
+    // We use useMemo with empty dependency to run once, or useEffect. 
+    // Since this is a side effect, useEffect is better.
+    // Wait, I can't put useEffect inside useMemo block in the tool. 
+    // I will use the tool to insert useEffect before routerContext.
+
 
     return (
       <TanStackQueryProvider.Provider {...TanStackQueryProviderContext}>
