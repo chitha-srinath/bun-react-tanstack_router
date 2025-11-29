@@ -14,7 +14,7 @@ import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedHomeRouteImport } from './routes/_authenticated/home'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
-import { Route as AuthenticatedDemoTanstackQueryRouteImport } from './routes/_authenticated/demo/tanstack-query'
+import { Route as AuthenticatedDemoTanstackQueryRouteImport } from './routes/_authenticated/_demo/tanstack-query'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -42,8 +42,8 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
 } as any)
 const AuthenticatedDemoTanstackQueryRoute =
   AuthenticatedDemoTanstackQueryRouteImport.update({
-    id: '/demo/tanstack-query',
-    path: '/demo/tanstack-query',
+    id: '/_demo/tanstack-query',
+    path: '/tanstack-query',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
 
@@ -52,14 +52,14 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/home': typeof AuthenticatedHomeRoute
-  '/demo/tanstack-query': typeof AuthenticatedDemoTanstackQueryRoute
+  '/tanstack-query': typeof AuthenticatedDemoTanstackQueryRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/home': typeof AuthenticatedHomeRoute
-  '/demo/tanstack-query': typeof AuthenticatedDemoTanstackQueryRoute
+  '/tanstack-query': typeof AuthenticatedDemoTanstackQueryRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -68,13 +68,13 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/home': typeof AuthenticatedHomeRoute
-  '/_authenticated/demo/tanstack-query': typeof AuthenticatedDemoTanstackQueryRoute
+  '/_authenticated/_demo/tanstack-query': typeof AuthenticatedDemoTanstackQueryRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/dashboard' | '/home' | '/demo/tanstack-query'
+  fullPaths: '/' | '/login' | '/dashboard' | '/home' | '/tanstack-query'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/dashboard' | '/home' | '/demo/tanstack-query'
+  to: '/' | '/login' | '/dashboard' | '/home' | '/tanstack-query'
   id:
     | '__root__'
     | '/'
@@ -82,7 +82,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/_authenticated/dashboard'
     | '/_authenticated/home'
-    | '/_authenticated/demo/tanstack-query'
+    | '/_authenticated/_demo/tanstack-query'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -128,10 +128,10 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/demo/tanstack-query': {
-      id: '/_authenticated/demo/tanstack-query'
-      path: '/demo/tanstack-query'
-      fullPath: '/demo/tanstack-query'
+    '/_authenticated/_demo/tanstack-query': {
+      id: '/_authenticated/_demo/tanstack-query'
+      path: '/tanstack-query'
+      fullPath: '/tanstack-query'
       preLoaderRoute: typeof AuthenticatedDemoTanstackQueryRouteImport
       parentRoute: typeof AuthenticatedRoute
     }

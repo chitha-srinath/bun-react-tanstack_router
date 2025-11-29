@@ -1,7 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import api from "@/lib/api";
 
-export const Route = createFileRoute("/_authenticated/demo/tanstack-query")({
+export const Route = createFileRoute("/_authenticated/_demo/tanstack-query")({
   component: TanStackQueryDemo,
 });
 
@@ -9,15 +10,14 @@ function TanStackQueryDemo() {
   const { data, error, isLoading } = useQuery({
     queryKey: ["todos"],
     queryFn: async () => {
-      // Use standard fetch instead of RPC for now
-      const response = await fetch("/api/todos");
-      const result = await response.json();
+      const response = await api.get("/posts");
+      const result = response.data;
 
-      if (!result.success) {
+      if (result.error) {
         throw new Error(result.message);
       }
 
-      return result.data?.todos || [];
+      return result.data || [];
     },
     initialData: [],
   });
