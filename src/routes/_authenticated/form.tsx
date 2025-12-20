@@ -2,13 +2,14 @@ import { createFileRoute } from '@tanstack/react-router'
 import { useState, useRef } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useDebouncedCallback } from '../../hooks/use-debounce'
+import { usersQueryOptions } from '@/lib/query-options'
 
 export const Route = createFileRoute('/_authenticated/form')({
     component: RouteComponent,
 })
 
 function RouteComponent() {
-    console.log("Render")
+
 
     const [searchQuery, setSearchQuery] = useState('srinath')
     const inputRef = useRef<HTMLInputElement>(null)
@@ -17,19 +18,9 @@ function RouteComponent() {
         setSearchQuery(value)
     }, 500)
 
-    const { data } = useQuery({
-        queryKey: ['users', searchQuery],
-        queryFn: async () => {
-            await new Promise((resolve) => setTimeout(resolve, 1000))
-            return {
-                id: 1,
-                name: 'srinath',
-                age: 20
-            }
-        },
-    })
+    const { data } = useQuery(usersQueryOptions(searchQuery))
 
-    console.log(data)
+
 
     return (
         <div>

@@ -1,26 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import api from "@/lib/api";
+import { todosQueryOptions } from "@/lib/query-options";
 
 export const Route = createFileRoute("/_authenticated/_demo/tanstack-query")({
   component: TanStackQueryDemo,
 });
 
 function TanStackQueryDemo() {
-  const { data, error, isLoading } = useQuery({
-    queryKey: ["todos"],
-    queryFn: async () => {
-      const response = await api.get("/posts");
-      const result = response.data;
-
-      if (result.error) {
-        throw new Error(result.message);
-      }
-
-      return result.data || [];
-    },
-    initialData: [],
-  });
+  const { data, error, isLoading } = useQuery(todosQueryOptions);
 
   if (isLoading) {
     return (
