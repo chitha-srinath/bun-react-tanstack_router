@@ -9,6 +9,7 @@ import TanStackQueryDevtools from '../integrations/tanstack-query/devtools'
 import type { QueryClient } from '@tanstack/react-query'
 import type { AuthState } from '@/stores/auth.store'
 import { NotFound } from '@/components/NotFound'
+import { Toaster } from '@/components/ui/toaster'
 
 interface MyRouterContext {
   queryClient: QueryClient;
@@ -49,6 +50,7 @@ function RootComponent() {
           TanStackQueryDevtools,
         ]}
       />
+      <Toaster />
     </>
   );
 }

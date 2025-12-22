@@ -40,7 +40,7 @@ export default function RegisterForm({ onToggleForm }: RegisterFormProps) {
     try {
       const success = await register(username, email, password);
       if (success) {
-        navigate({ to: "/home" });
+        navigate({ to: "/login", search: { redirect: undefined } });
       } else {
         setError("Registration failed. Please try again.");
       }
