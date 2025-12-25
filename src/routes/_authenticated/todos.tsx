@@ -71,70 +71,70 @@ function Todos() {
 
 
   return (
-    <div
-      className="flex items-center justify-center min-h-screen bg-gradient-to-br from-purple-100 to-blue-100 p-4 text-white overflow-y-auto"
-      style={{
-        backgroundImage:
-          "radial-gradient(50% 50% at 95% 5%, #f4a460 0%, #8b4513 70%, #1a0f0a 100%)",
-      }}
-    >
-      <div className="w-full max-w-4xl p-8 rounded-xl backdrop-blur-md bg-black/50 shadow-xl border-8 border-black/10 my-10 relative">
-        <TodoHeader
-          title="Todo List (Infinite Query)"
-          searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
-          onCreate={handleCreate}
-        />
+    // <div
+    //   className="flex items-center justify-center bg-gradient-to-br from-purple-100 to-blue-100 p-4 text-white overflow-y-auto"
+    //   style={{
+    //     backgroundImage:
+    //       "radial-gradient(50% 50% at 95% 5%, #f4a460 0%, #8b4513 70%, #1a0f0a 100%)",
+    //   }}
+    // >
+    <div className="w-full flex flex-col gap-4 p-4">
+      <TodoHeader
+        title="Todo List (Infinite Query)"
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+        onCreate={handleCreate}
+      />
 
-        {isLoading ? (
-          <div className="flex items-center justify-center py-20">
-            Loading...
+      {isLoading ? (
+        <div className="flex items-center justify-center py-20">
+          Loading...
+        </div>
+      ) : error ? (
+        <div className="flex items-center justify-center py-20 text-red-400">
+          Error: {error instanceof Error ? error?.message : "Unknown error"}
+        </div>
+      ) : (
+        <div className="space-y-6">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {todos.map((todo) => (
+              <TodoCard
+                key={todo.id}
+                todo={todo}
+                onEdit={handleEdit}
+                onDelete={(id) => deleteMutation.mutate(id.toString())}
+                onToggle={(id) => toggleMutation.mutate({ id: id.toString(), completed: !todo.completed })}
+              />
+            ))}
           </div>
-        ) : error ? (
-          <div className="flex items-center justify-center py-20 text-red-400">
-            Error: {error instanceof Error ? error?.message : "Unknown error"}
-          </div>
-        ) : (
-          <div className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {todos.map((todo) => (
-                <TodoCard
-                  key={todo.id}
-                  todo={todo}
-                  onEdit={handleEdit}
-                  onDelete={(id) => deleteMutation.mutate(id.toString())}
-                  onToggle={(id) => toggleMutation.mutate({ id: id.toString(), completed: !todo.completed })}
-                />
-              ))}
+
+          {hasNextPage && (
+            <div className="flex justify-center mt-6">
+              <Button
+                onClick={() => fetchNextPage()}
+                disabled={isFetchingNextPage}
+                variant="secondary"
+              >
+                {isFetchingNextPage ? "Loading more..." : "Load More"}
+              </Button>
             </div>
+          )}
 
-            {hasNextPage && (
-              <div className="flex justify-center mt-6">
-                <Button
-                  onClick={() => fetchNextPage()}
-                  disabled={isFetchingNextPage}
-                  variant="secondary"
-                >
-                  {isFetchingNextPage ? "Loading more..." : "Load More"}
-                </Button>
-              </div>
-            )}
+          {todos.length === 0 && (
+            <div className="text-center text-gray-400 mt-10">
+              No todos found.
+            </div>
+          )}
+        </div>
+      )}
 
-            {todos.length === 0 && (
-              <div className="text-center text-gray-400 mt-10">
-                No todos found.
-              </div>
-            )}
-          </div>
-        )}
-
-        <TodoSheet
-          isOpen={isSheetOpen}
-          onClose={() => setIsSheetOpen(false)}
-          onSave={handleSave}
-          todo={selectedTodo}
-        />
-      </div>
+      <TodoSheet
+        isOpen={isSheetOpen}
+        onClose={() => setIsSheetOpen(false)}
+        onSave={handleSave}
+        todo={selectedTodo}
+      />
     </div>
+    // </div>
   );
 }

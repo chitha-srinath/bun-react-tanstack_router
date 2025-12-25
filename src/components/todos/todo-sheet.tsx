@@ -53,7 +53,7 @@ export function TodoSheet({ isOpen, onClose, onSave, todo }: TodoSheetProps) {
                         </SheetDescription>
                     </SheetHeader>
 
-                    <div className="px-2 flex flex-col gap-4 flex-1">
+                    <div className="px-4 flex flex-col gap-4 flex-1">
                         <form.Field name="title">
                             {(field) => (
                                 <div className="grid gap-2">

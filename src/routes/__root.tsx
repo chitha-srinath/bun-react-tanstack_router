@@ -36,8 +36,12 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 function RootComponent() {
   return (
     <>
-      <Header />
-      <Outlet />
+      <div className="flex flex-col h-screen overflow-hidden">
+        <Header />
+        <div className="flex-1 overflow-y-auto">
+          <Outlet />
+        </div>
+      </div>
       <TanStackDevtools
         config={{
           position: 'bottom-right',
