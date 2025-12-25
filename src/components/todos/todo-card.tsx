@@ -16,22 +16,20 @@ interface TodoCardProps {
     todo: Todo
     onEdit: (todo: Todo) => void
     onDelete: (id: string) => void
-    onToggle: (id: string) => void
+    onToggle: (id: string, newStatus: boolean) => void
 }
 
 export function TodoCard({ todo, onEdit, onDelete, onToggle }: TodoCardProps) {
     return (
         <motion.div
-            layout
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.2 }}
             className="aspect-square w-full"
         >
             <Card
                 className={cn(
-                    "group relative flex h-full w-full flex-col overflow-hidden transition-all duration-300 hover:shadow-xl",
+                    "group relative flex h-full w-full flex-col overflow-hidden transition-all duration-300 hover:shadow-md",
                     todo.completed ? "bg-muted/50 opacity-80" : "bg-card",
                 )}
             >
@@ -66,7 +64,7 @@ export function TodoCard({ todo, onEdit, onDelete, onToggle }: TodoCardProps) {
                         <div className="flex items-start gap-2">
                             <motion.div
                                 whileTap={{ scale: 0.8 }}
-                                onClick={() => onToggle(todo.id)}
+                                onClick={() => onToggle(todo.id, !todo.completed)}
                                 className={cn(
                                     "mt-1 flex h-4 w-4 shrink-0 items-center justify-center rounded-full border transition-colors cursor-pointer",
                                     todo.completed ? "bg-primary border-primary" : "border-muted-foreground/30",
@@ -94,7 +92,7 @@ export function TodoCard({ todo, onEdit, onDelete, onToggle }: TodoCardProps) {
                                     "text-lg font-bold leading-tight line-clamp-2 transition-all cursor-pointer",
                                     todo.completed && "line-through text-muted-foreground",
                                 )}
-                                onClick={() => onToggle(todo.id)}
+                                onClick={() => onToggle(todo.id, !todo.completed)}
                             >
                                 {todo.title}
                             </CardTitle>

@@ -1,12 +1,11 @@
-import { TodoCard } from "@/components/todos/todo-card";
 import { TodoSheet } from "@/components/todos/todo-sheet";
-import { Button } from "@/components/ui/Button";
+import { TodoListVirtual } from "@/components/todos/todo-list-virtual";
 import { type Todo } from "@/lib/api/todos";
 import { createMutationOptions, deleteMutationOptions, toggleMutationOptions, updateMutationOptions } from "@/lib/mutation-options";
 import { todosQueryOptions } from "@/lib/query-options";
 import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 
 
 import { TodoHeader } from "@/components/todos/todo-header";
@@ -43,10 +42,10 @@ function Todos() {
 
   const toggleMutation = useMutation(toggleMutationOptions(queryClient));
 
-  const handleEdit = (todo: Todo) => {
+  const handleEdit = useCallback((todo: Todo) => {
     setSelectedTodo(todo);
     setIsSheetOpen(true);
-  };
+  }, []);
 
   const handleCreate = () => {
     setSelectedTodo(null);
@@ -86,46 +85,23 @@ function Todos() {
         onCreate={handleCreate}
       />
 
-      {isLoading ? (
-        <div className="flex items-center justify-center py-20">
-          Loading...
-        </div>
-      ) : error ? (
+      {error ? (
         <div className="flex items-center justify-center py-20 text-red-400">
           Error: {error instanceof Error ? error?.message : "Unknown error"}
         </div>
       ) : (
-        <div className="space-y-6">
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {todos.map((todo) => (
-              <TodoCard
-                key={todo.id}
-                todo={todo}
-                onEdit={handleEdit}
-                onDelete={(id) => deleteMutation.mutate(id.toString())}
-                onToggle={(id) => toggleMutation.mutate({ id: id.toString(), completed: !todo.completed })}
-              />
-            ))}
-          </div>
-
-          {hasNextPage && (
-            <div className="flex justify-center mt-6">
-              <Button
-                onClick={() => fetchNextPage()}
-                disabled={isFetchingNextPage}
-                variant="secondary"
-              >
-                {isFetchingNextPage ? "Loading more..." : "Load More"}
-              </Button>
-            </div>
-          )}
-
-          {todos.length === 0 && (
-            <div className="text-center text-gray-400 mt-10">
-              No todos found.
-            </div>
-          )}
-        </div>
+        <TodoListVirtual
+          todos={todos}
+          isLoading={isLoading}
+          hasNextPage={hasNextPage}
+          fetchNextPage={fetchNextPage}
+          isFetchingNextPage={isFetchingNextPage}
+          onEdit={handleEdit}
+          onDelete={useCallback((id: string) => deleteMutation.mutate(id), [deleteMutation])}
+          onToggle={useCallback((id: string, newStatus: boolean) => {
+            toggleMutation.mutate({ id, completed: newStatus });
+          }, [toggleMutation])}
+        />
       )}
 
       <TodoSheet

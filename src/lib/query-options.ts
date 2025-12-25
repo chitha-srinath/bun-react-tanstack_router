@@ -6,7 +6,7 @@ import { fetchTodos } from "./api/todos";
 
 export const todosQueryOptions = (options: { search?: string }) => infiniteQueryOptions({
     queryKey: [QUERY_KEYS.todos, options.search],
-    queryFn: () => fetchTodos(options),
+    queryFn: ({ pageParam }) => fetchTodos({ ...options, page: pageParam as number }),
     initialPageParam: 1,
     getNextPageParam: (lastPage) => {
         const { page, total, limit } = lastPage.data.pagination;
