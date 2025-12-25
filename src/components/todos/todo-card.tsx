@@ -1,6 +1,3 @@
-
-"use client"
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card"
 import { Button } from "@/components/ui/Button"
 import { MoreVertical, Pencil, Trash2 } from "lucide-react"
@@ -18,8 +15,8 @@ import { cn } from "@/lib/utils"
 interface TodoCardProps {
     todo: Todo
     onEdit: (todo: Todo) => void
-    onDelete: (id: number) => void
-    onToggle: (id: number) => void
+    onDelete: (id: string) => void
+    onToggle: (id: string) => void
 }
 
 export function TodoCard({ todo, onEdit, onDelete, onToggle }: TodoCardProps) {

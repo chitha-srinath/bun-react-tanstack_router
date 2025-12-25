@@ -30,14 +30,14 @@ export function TodoSheet({ isOpen, onClose, onSave, todo }: TodoSheetProps) {
     return (
         <Sheet
             open={isOpen}
-            onOpenChange={(open) => {
+            onOpenChange={(open: boolean) => {
                 if (!open) {
                     onClose()
                     form.reset()
                 }
             }}
         >
-            <SheetContent className="sm:max-w-[450px]">
+            <SheetContent className="sm:max-w-[350px]">
                 <form
                     onSubmit={(e) => {
                         e.preventDefault()
@@ -53,7 +53,7 @@ export function TodoSheet({ isOpen, onClose, onSave, todo }: TodoSheetProps) {
                         </SheetDescription>
                     </SheetHeader>
 
-                    <div className="grid gap-6 py-4 flex-1">
+                    <div className="px-2 flex flex-col gap-4 flex-1">
                         <form.Field name="title">
                             {(field) => (
                                 <div className="grid gap-2">

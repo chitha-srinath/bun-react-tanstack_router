@@ -1,7 +1,8 @@
 "use client"
 
 import { useMutation, useQueryClient, useInfiniteQuery } from "@tanstack/react-query"
-import { fetchTodos, createTodo, updateTodo, deleteTodo, toggleTodo, type Todo } from "@/lib/api/todos"
+import { createTodo, updateTodo, deleteTodo, toggleTodo, type Todo } from "@/lib/api/todos"
+import { todosQueryOptions } from "@/lib/query-options"
 import { useState, useEffect } from "react"
 import { useToast } from "@/hooks/use-toast"
 
@@ -18,16 +19,7 @@ export function useTodos(searchQuery?: string) {
         return () => clearTimeout(handler)
     }, [searchQuery])
 
-    const todosQuery = useInfiniteQuery({
-        queryKey: ["todos", debouncedSearch],
-        queryFn: fetchTodos,
-        initialPageParam: 1,
-        getNextPageParam: (lastPage) => {
-            const { page, total, limit } = lastPage.data.pagination;
-            const totalPages = Math.ceil(total / limit);
-            return page < totalPages ? page + 1 : undefined;
-        },
-    })
+    const todosQuery = useInfiniteQuery(todosQueryOptions({ search: debouncedSearch }))
 
     const createMutation = useMutation({
         mutationFn: createTodo,

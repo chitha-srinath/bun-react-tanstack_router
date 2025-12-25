@@ -69,7 +69,7 @@ export default function Header() {
           {/* Demo Links Start */}
           {isAuthenticated && (
             <Link
-              to="/tanstack-query"
+              to="/todos"
               onClick={() => setIsOpen(false)}
               className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-800 transition-colors mb-2"
               activeProps={{
@@ -78,7 +78,7 @@ export default function Header() {
               }}
             >
               <Network size={20} />
-              <span className="font-medium">TanStack Query</span>
+              <span className="font-medium">Todos</span>
             </Link>
           )}
           {/* Demo Links End */}

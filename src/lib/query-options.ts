@@ -1,23 +1,18 @@
-import { queryOptions } from "@tanstack/react-query";
+import { infiniteQueryOptions, queryOptions } from "@tanstack/react-query";
 
 import { QUERY_KEYS } from "./constants";
 
 import { fetchTodos } from "./api/todos";
 
-export const todosQueryOptions = queryOptions({
-    queryKey: [QUERY_KEYS.todos],
-    queryFn: async () => {
-        // Since fetchTodos is now designed for infinite query/pagination,
-        // we might pass checking of array wrapped in object or regular array.
-        // For consistent simple query usage, we can just call it and return data.
-        const response = await fetchTodos({});
-        // fetchTodos returns { todos, nextCursor } now or just data.
-        // We'll normalize it for this simple query if needed, 
-        // but given useInfiniteQuery usage elsewhere, let's keep it simple here 
-        // by handling the response structure.
-        return response.data.todos;
+export const todosQueryOptions = (options: { search?: string }) => infiniteQueryOptions({
+    queryKey: [QUERY_KEYS.todos, options.search],
+    queryFn: () => fetchTodos(options),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) => {
+        const { page, total, limit } = lastPage.data.pagination;
+        const totalPages = Math.ceil(total / limit);
+        return page < totalPages ? page + 1 : undefined;
     },
-    initialData: [],
 });
 
 export const usersQueryOptions = (searchQuery: string) => queryOptions({
