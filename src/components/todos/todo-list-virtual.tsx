@@ -88,7 +88,7 @@ export function TodoListVirtual({
     return (
         <div
             ref={parentRef}
-            className="h-[800px] w-full overflow-y-auto contain-strict scroll-smooth p-2"
+            className="h-full w-full overflow-y-auto contain-strict scroll-smooth p-2"
         >
             <div
                 style={{

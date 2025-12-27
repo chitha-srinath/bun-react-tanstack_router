@@ -1,25 +1,32 @@
+import { TodoHeader } from "@/components/todos/todo-header";
 import { TodoSheet } from "@/components/todos/todo-sheet";
-import { TodoListVirtual } from "@/components/todos/todo-list-virtual";
+import { TodosProvider, type TodosContextType } from "@/components/todos/todos-context";
 import { type Todo } from "@/lib/api/todos";
 import { createMutationOptions, deleteMutationOptions, toggleMutationOptions, updateMutationOptions } from "@/lib/mutation-options";
-import { todosQueryOptions } from "@/lib/query-options";
-import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { createFileRoute } from "@tanstack/react-router";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { createFileRoute, Link, Outlet } from "@tanstack/react-router";
 import { useCallback, useState } from "react";
 
-
-import { TodoHeader } from "@/components/todos/todo-header";
+type TodosSearch = {
+  search?: string;
+};
 
 export const Route = createFileRoute("/_authenticated/todos")({
-  component: Todos,
+  component: TodosLayout,
+  validateSearch: (search: Record<string, unknown>): TodosSearch => {
+    return {
+      search: (search.search as string) || "",
+    };
+  },
 });
 
-function Todos() {
+
+function TodosLayout() {
+  const { search } = Route.useSearch();
+  const navigate = Route.useNavigate();
   const queryClient = useQueryClient();
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [selectedTodo, setSelectedTodo] = useState<Todo | null>(null);
-  const [searchQuery, setSearchQuery] = useState("");
-  const { data, error, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery(todosQueryOptions({ search: searchQuery }));
 
   const createMutation = useMutation({
     ...createMutationOptions(queryClient),
@@ -64,53 +71,54 @@ function Todos() {
     }
   };
 
-  // Flatten the pages to get all todos
-  const todos = data?.pages.flatMap((page) => page.data.todos) ?? [];
-
-
+  const context: TodosContextType = {
+    onEdit: handleEdit,
+    onDelete: useCallback((id: string) => deleteMutation.mutate(id), [deleteMutation]),
+    onToggle: useCallback((id: string, newStatus: boolean) => {
+      toggleMutation.mutate({ id, completed: newStatus });
+    }, [toggleMutation])
+  };
 
   return (
-    // <div
-    //   className="flex items-center justify-center bg-gradient-to-br from-purple-100 to-blue-100 p-4 text-white overflow-y-auto"
-    //   style={{
-    //     backgroundImage:
-    //       "radial-gradient(50% 50% at 95% 5%, #f4a460 0%, #8b4513 70%, #1a0f0a 100%)",
-    //   }}
-    // >
-    <div className="w-full flex flex-col gap-4 p-4">
-      <TodoHeader
-        title="Todo List (Infinite Query)"
-        searchQuery={searchQuery}
-        setSearchQuery={setSearchQuery}
-        onCreate={handleCreate}
-      />
-
-      {error ? (
-        <div className="flex items-center justify-center py-20 text-red-400">
-          Error: {error instanceof Error ? error?.message : "Unknown error"}
-        </div>
-      ) : (
-        <TodoListVirtual
-          todos={todos}
-          isLoading={isLoading}
-          hasNextPage={hasNextPage}
-          fetchNextPage={fetchNextPage}
-          isFetchingNextPage={isFetchingNextPage}
-          onEdit={handleEdit}
-          onDelete={useCallback((id: string) => deleteMutation.mutate(id), [deleteMutation])}
-          onToggle={useCallback((id: string, newStatus: boolean) => {
-            toggleMutation.mutate({ id, completed: newStatus });
-          }, [toggleMutation])}
+    <TodosProvider value={context}>
+      <div className="w-full flex flex-col gap-4 p-4 h-[calc(100vh-4rem)]">
+        <TodoHeader
+          title="Todo List"
+          searchQuery={search || ""}
+          setSearchQuery={(val) => navigate({ search: { search: val }, replace: true })}
+          onCreate={handleCreate}
         />
-      )}
 
-      <TodoSheet
-        isOpen={isSheetOpen}
-        onClose={() => setIsSheetOpen(false)}
-        onSave={handleSave}
-        todo={selectedTodo}
-      />
-    </div>
-    // </div>
+        <div className="flex gap-4 border-b border-gray-200 dark:border-gray-700 pb-2">
+          <Link
+            to="/todos"
+            activeProps={{ className: "font-bold text-primary border-b-2 border-primary" }}
+            className="px-4 py-2 hover:text-primary transition-colors"
+            activeOptions={{ exact: true }}
+            search={{ search }}
+          >
+            Infinite Scroll
+          </Link>
+          <Link
+            to="/todos/virtual"
+            activeProps={{ className: "font-bold text-primary border-b-2 border-primary" }}
+            className="px-4 py-2 hover:text-primary transition-colors"
+            search={{ search }}
+          >
+            Virtualizer
+          </Link>
+        </div>
+
+        {/* Removed Error boundary around outlet as data fetching is in child */}
+        <Outlet />
+
+        <TodoSheet
+          isOpen={isSheetOpen}
+          onClose={() => setIsSheetOpen(false)}
+          onSave={handleSave}
+          todo={selectedTodo}
+        />
+      </div>
+    </TodosProvider>
   );
 }

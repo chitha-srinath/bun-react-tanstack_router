@@ -16,6 +16,8 @@ import { Route as AuthenticatedTodosRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedHomeRouteImport } from './routes/_authenticated/home'
 import { Route as AuthenticatedFormRouteImport } from './routes/_authenticated/form'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedTodosIndexRouteImport } from './routes/_authenticated/todos/index'
+import { Route as AuthenticatedTodosVirtualRouteImport } from './routes/_authenticated/todos/virtual'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -51,6 +53,17 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedTodosIndexRoute = AuthenticatedTodosIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthenticatedTodosRoute,
+} as any)
+const AuthenticatedTodosVirtualRoute =
+  AuthenticatedTodosVirtualRouteImport.update({
+    id: '/virtual',
+    path: '/virtual',
+    getParentRoute: () => AuthenticatedTodosRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -58,7 +71,9 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/form': typeof AuthenticatedFormRoute
   '/home': typeof AuthenticatedHomeRoute
-  '/todos': typeof AuthenticatedTodosRoute
+  '/todos': typeof AuthenticatedTodosRouteWithChildren
+  '/todos/virtual': typeof AuthenticatedTodosVirtualRoute
+  '/todos/': typeof AuthenticatedTodosIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -66,7 +81,8 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/form': typeof AuthenticatedFormRoute
   '/home': typeof AuthenticatedHomeRoute
-  '/todos': typeof AuthenticatedTodosRoute
+  '/todos/virtual': typeof AuthenticatedTodosVirtualRoute
+  '/todos': typeof AuthenticatedTodosIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -76,13 +92,30 @@ export interface FileRoutesById {
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/form': typeof AuthenticatedFormRoute
   '/_authenticated/home': typeof AuthenticatedHomeRoute
-  '/_authenticated/todos': typeof AuthenticatedTodosRoute
+  '/_authenticated/todos': typeof AuthenticatedTodosRouteWithChildren
+  '/_authenticated/todos/virtual': typeof AuthenticatedTodosVirtualRoute
+  '/_authenticated/todos/': typeof AuthenticatedTodosIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/dashboard' | '/form' | '/home' | '/todos'
+  fullPaths:
+    | '/'
+    | '/login'
+    | '/dashboard'
+    | '/form'
+    | '/home'
+    | '/todos'
+    | '/todos/virtual'
+    | '/todos/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/dashboard' | '/form' | '/home' | '/todos'
+  to:
+    | '/'
+    | '/login'
+    | '/dashboard'
+    | '/form'
+    | '/home'
+    | '/todos/virtual'
+    | '/todos'
   id:
     | '__root__'
     | '/'
@@ -92,6 +125,8 @@ export interface FileRouteTypes {
     | '/_authenticated/form'
     | '/_authenticated/home'
     | '/_authenticated/todos'
+    | '/_authenticated/todos/virtual'
+    | '/_authenticated/todos/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -151,21 +186,48 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/todos/': {
+      id: '/_authenticated/todos/'
+      path: '/'
+      fullPath: '/todos/'
+      preLoaderRoute: typeof AuthenticatedTodosIndexRouteImport
+      parentRoute: typeof AuthenticatedTodosRoute
+    }
+    '/_authenticated/todos/virtual': {
+      id: '/_authenticated/todos/virtual'
+      path: '/virtual'
+      fullPath: '/todos/virtual'
+      preLoaderRoute: typeof AuthenticatedTodosVirtualRouteImport
+      parentRoute: typeof AuthenticatedTodosRoute
+    }
   }
 }
+
+interface AuthenticatedTodosRouteChildren {
+  AuthenticatedTodosVirtualRoute: typeof AuthenticatedTodosVirtualRoute
+  AuthenticatedTodosIndexRoute: typeof AuthenticatedTodosIndexRoute
+}
+
+const AuthenticatedTodosRouteChildren: AuthenticatedTodosRouteChildren = {
+  AuthenticatedTodosVirtualRoute: AuthenticatedTodosVirtualRoute,
+  AuthenticatedTodosIndexRoute: AuthenticatedTodosIndexRoute,
+}
+
+const AuthenticatedTodosRouteWithChildren =
+  AuthenticatedTodosRoute._addFileChildren(AuthenticatedTodosRouteChildren)
 
 interface AuthenticatedRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedFormRoute: typeof AuthenticatedFormRoute
   AuthenticatedHomeRoute: typeof AuthenticatedHomeRoute
-  AuthenticatedTodosRoute: typeof AuthenticatedTodosRoute
+  AuthenticatedTodosRoute: typeof AuthenticatedTodosRouteWithChildren
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedFormRoute: AuthenticatedFormRoute,
   AuthenticatedHomeRoute: AuthenticatedHomeRoute,
-  AuthenticatedTodosRoute: AuthenticatedTodosRoute,
+  AuthenticatedTodosRoute: AuthenticatedTodosRouteWithChildren,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
