@@ -2,6 +2,10 @@ import { createContext, useContext } from "react";
 import { type Todo } from "@/lib/api/todos";
 
 export type TodosContextType = {
+    search: string;
+    setSearch: (query: string) => void;
+    filter: { status?: string, date?: string };
+    setFilter: (filter: { status?: string, date?: string }) => void;
     onEdit: (todo: Todo) => void;
     onDelete: (id: string) => void;
     onToggle: (id: string, newStatus: boolean) => void;

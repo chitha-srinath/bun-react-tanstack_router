@@ -4,8 +4,8 @@ import { QUERY_KEYS } from "./constants";
 
 import { fetchTodos } from "./api/todos";
 
-export const todosQueryOptions = (options: { search?: string }) => infiniteQueryOptions({
-    queryKey: [QUERY_KEYS.todos, options.search],
+export const todosQueryOptions = (options: { search?: string, filter?: { status?: string, date?: string } }) => infiniteQueryOptions({
+    queryKey: [QUERY_KEYS.todos, options.search, options.filter],
     queryFn: ({ pageParam }) => fetchTodos({ ...options, page: pageParam as number }),
     initialPageParam: 1,
     getNextPageParam: (lastPage) => {

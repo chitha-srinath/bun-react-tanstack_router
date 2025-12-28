@@ -7,26 +7,32 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Link, Outlet } from "@tanstack/react-router";
 import { useCallback, useState } from "react";
 
-type TodosSearch = {
-  search?: string;
-};
+// type TodosSearch = {
+//   search?: string;
+//   filter?: {
+//     status?: string;
+//     date?: string;
+//   };
+// };
 
 export const Route = createFileRoute("/_authenticated/todos")({
   component: TodosLayout,
-  validateSearch: (search: Record<string, unknown>): TodosSearch => {
-    return {
-      search: (search.search as string) || "",
-    };
-  },
+  //   validateSearch: (search: Record<string, unknown>): TodosSearch => {
+  //     return {
+  //       search: (search.search as string) || "",
+  //       filter: (search.filter as TodosSearch["filter"]) || { status: "all", date: "" },
+  //     };
+  //   },
 });
 
 
 function TodosLayout() {
-  const { search } = Route.useSearch();
-  const navigate = Route.useNavigate();
   const queryClient = useQueryClient();
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [selectedTodo, setSelectedTodo] = useState<Todo | null>(null);
+
+  const [search, setSearch] = useState("");
+  const [filter, setFilter] = useState<{ status?: string, date?: string }>({ status: "all", date: "" });
 
   const createMutation = useMutation({
     ...createMutationOptions(queryClient),
@@ -72,6 +78,10 @@ function TodosLayout() {
   };
 
   const context: TodosContextType = {
+    search,
+    setSearch,
+    filter,
+    setFilter,
     onEdit: handleEdit,
     onDelete: useCallback((id: string) => deleteMutation.mutate(id), [deleteMutation]),
     onToggle: useCallback((id: string, newStatus: boolean) => {
@@ -83,9 +93,6 @@ function TodosLayout() {
     <TodosProvider value={context}>
       <div className="w-full flex flex-col gap-4 p-4 h-[calc(100vh-4rem)]">
         <TodoHeader
-          title="Todo List"
-          searchQuery={search || ""}
-          setSearchQuery={(val) => navigate({ search: { search: val }, replace: true })}
           onCreate={handleCreate}
         />
 
@@ -95,7 +102,6 @@ function TodosLayout() {
             activeProps={{ className: "font-bold text-primary border-b-2 border-primary" }}
             className="px-4 py-2 hover:text-primary transition-colors"
             activeOptions={{ exact: true }}
-            search={{ search }}
           >
             Infinite Scroll
           </Link>
@@ -103,7 +109,6 @@ function TodosLayout() {
             to="/todos/virtual"
             activeProps={{ className: "font-bold text-primary border-b-2 border-primary" }}
             className="px-4 py-2 hover:text-primary transition-colors"
-            search={{ search }}
           >
             Virtualizer
           </Link>

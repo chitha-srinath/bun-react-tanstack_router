@@ -1,26 +1,23 @@
 import { Button } from "@/components/ui/Button"
 import { Input } from "@/components/ui/Input"
 import { useDebouncedCallback } from "@/hooks/use-debounce"
-import { Filter, Plus, Search } from "lucide-react"
+import { Plus, Search } from "lucide-react"
 import { useState } from "react"
+import { TodoFilters } from "./todo-filters"
+import { useTodosContext } from "./todos-context"
 
 interface TodoHeaderProps {
-    title?: string
-    searchQuery: string
-    setSearchQuery: (query: string) => void
     onCreate: () => void
 }
 
 export function TodoHeader({
-    title = "Todo List",
-    searchQuery,
-    setSearchQuery,
     onCreate
 }: TodoHeaderProps) {
-    const [localSearch, setLocalSearch] = useState(searchQuery)
+    const { search, setSearch } = useTodosContext()
+    const [localSearch, setLocalSearch] = useState(search)
 
     const debouncedSetSearch = useDebouncedCallback((value: string) => {
-        setSearchQuery(value)
+        setSearch(value)
     }, 300)
 
     function handleSearch(e: React.ChangeEvent<HTMLInputElement>) {
@@ -52,9 +49,7 @@ export function TodoHeader({
 
             </div>
 
-            <Button variant="outline" size="sm" className="flex-shrink-0">
-                <Filter className="mr-2 h-4 w-4" /> Filters
-            </Button>
+            <TodoFilters />
 
         </div>
     )

@@ -33,12 +33,13 @@ export interface GetTodosResponse {
 }
 
 // Support for infinite query pagination
-export const fetchTodos = async ({ page = 1, limit = 20, skip = 0, search }: { page?: number, limit?: number, skip?: number, search?: string }): Promise<GetTodosResponse> => {
+export const fetchTodos = async ({ page = 1, limit = 20, skip = 0, search, filter }: { page?: number, limit?: number, skip?: number, search?: string, filter?: { status?: string, date?: string } }): Promise<GetTodosResponse> => {
     const payload = {
         page,
         limit,
         skip,
-        ...(search && { search })
+        ...(search && { search }),
+        // ...(filter && { filter })
     };
 
     const response = await api.post("/todos/get-todos", payload);
