@@ -5,6 +5,8 @@ import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/Label"
 
 import { useForm } from "@tanstack/react-form"
+
+import { z } from "zod"
 import type { Todo } from "@/lib/api/todos"
 
 interface TodoSheetProps {
@@ -54,7 +56,15 @@ export function TodoSheet({ isOpen, onClose, onSave, todo }: TodoSheetProps) {
                     </SheetHeader>
 
                     <div className="px-4 flex flex-col gap-4 flex-1">
-                        <form.Field name="title">
+                        <form.Field
+                            name="title"
+                            validators={{
+                                onChange: ({ value }) => {
+                                    const res = z.string().min(1, "Title is required").safeParse(value)
+                                    return res.success ? undefined : res.error.issues[0].message
+                                },
+                            }}
+                        >
                             {(field) => (
                                 <div className="grid gap-2">
                                     <Label htmlFor={field.name} className="text-sm font-semibold">
@@ -69,6 +79,9 @@ export function TodoSheet({ isOpen, onClose, onSave, todo }: TodoSheetProps) {
                                         required
                                         className="focus-visible:ring-primary"
                                     />
+                                    {field.state.meta.isTouched && field.state.meta.errors.length ? (
+                                        <em className="text-red-500 text-xs">{field.state.meta.errors.join(", ")}</em>
+                                    ) : null}
                                 </div>
                             )}
                         </form.Field>
@@ -93,8 +106,10 @@ export function TodoSheet({ isOpen, onClose, onSave, todo }: TodoSheetProps) {
                     </div>
 
                     <SheetFooter className="pt-6 border-t mt-auto">
-                        <form.Subscribe selector={(state) => [state.isSubmitting]}>
-                            {([isSubmitting]) => (
+                        <form.Subscribe
+                            selector={(state) => [state.canSubmit, state.isSubmitting]}
+                        >
+                            {([canSubmit, isSubmitting]) => (
                                 <>
                                     <Button
                                         type="button"
@@ -108,7 +123,11 @@ export function TodoSheet({ isOpen, onClose, onSave, todo }: TodoSheetProps) {
                                     >
                                         Cancel
                                     </Button>
-                                    <Button type="submit" className="w-full sm:w-auto px-8" disabled={isSubmitting}>
+                                    <Button
+                                        type="submit"
+                                        className="w-full sm:w-auto px-8"
+                                        disabled={!canSubmit}
+                                    >
                                         {isSubmitting ? "Saving..." : todo ? "Update Task" : "Create Task"}
                                     </Button>
                                 </>
