@@ -116,3 +116,30 @@ export function TodoCard({ todo, onEdit, onDelete, onToggle }: TodoCardProps) {
         </motion.div>
     )
 }
+
+export function TodoCardSkeleton() {
+    return (
+        <div className="aspect-square w-full">
+            <Card className="h-full w-full flex flex-col overflow-hidden bg-card border-2 border-transparent">
+                <CardHeader className="flex-none pb-0 pt-4 px-4">
+                    <div className="flex items-center justify-end gap-2">
+                        <div className="h-8 w-8 rounded-full bg-muted animate-pulse" />
+                    </div>
+                </CardHeader>
+
+                <CardContent className="flex-1 flex flex-col justify-between p-4 pt-2">
+                    <div className="space-y-2">
+                        <div className="flex items-start gap-2">
+                            <div className="mt-1 h-4 w-4 shrink-0 rounded-full bg-muted animate-pulse" />
+                            <div className="w-full space-y-2">
+                                <div className="h-5 w-4/5 rounded bg-muted animate-pulse" />
+                                <div className="h-4 w-full rounded bg-muted/50 animate-pulse" />
+                                <div className="h-4 w-2/3 rounded bg-muted/50 animate-pulse" />
+                            </div>
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
+        </div>
+    )
+}

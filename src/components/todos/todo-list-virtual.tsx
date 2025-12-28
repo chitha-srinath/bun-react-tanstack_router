@@ -1,7 +1,7 @@
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { useRef, useEffect, useState } from "react";
 import { type Todo } from "@/lib/api/todos";
-import { TodoCard } from "./todo-card";
+import { TodoCard, TodoCardSkeleton } from "./todo-card";
 import { Spinner } from "@/components/ui/Spinner";
 
 interface TodoListVirtualProps {
@@ -82,7 +82,15 @@ export function TodoListVirtual({
     ]);
 
     if (isLoading && todos.length === 0) {
-        return <div className="text-center py-10">Loading first batch...</div>;
+        return (
+            <div className="h-full w-full p-2">
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pb-4 w-full">
+                    {Array.from({ length: 12 }).map((_, i) => (
+                        <TodoCardSkeleton key={i} />
+                    ))}
+                </div>
+            </div>
+        );
     }
 
     return (

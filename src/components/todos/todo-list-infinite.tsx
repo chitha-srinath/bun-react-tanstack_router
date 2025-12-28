@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { type Todo } from "@/lib/api/todos";
-import { TodoCard } from "./todo-card";
+import { TodoCard, TodoCardSkeleton } from "./todo-card";
 import { Spinner } from "@/components/ui/Spinner";
 
 interface TodoListInfiniteProps {
@@ -48,7 +48,15 @@ export function TodoListInfinite({
     }, [hasNextPage, fetchNextPage, isFetchingNextPage]);
 
     if (isLoading && todos.length === 0) {
-        return <div className="text-center py-10">Loading first batch...</div>;
+        return (
+            <div className="w-full h-full overflow-y-auto p-2">
+                <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 pb-4">
+                    {Array.from({ length: 12 }).map((_, i) => (
+                        <TodoCardSkeleton key={i} />
+                    ))}
+                </div>
+            </div>
+        );
     }
 
     return (
