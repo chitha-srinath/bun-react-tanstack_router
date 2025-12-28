@@ -34,7 +34,7 @@ import {
 import { cn } from "@/lib/utils"
 
 const filterSchema = z.object({
-    status: z.enum(["all", "completed", "pending"]),
+    status: z.enum(["all", "completed", "pending"]).optional().or(z.literal("")),
     date: z.string().optional(),
 })
 
@@ -46,7 +46,7 @@ export function TodoFilters() {
     const [isCalendarOpen, setIsCalendarOpen] = useState(false)
     const form = useForm({
         defaultValues: {
-            status: (filter?.status as "all" | "completed" | "pending") ?? 'all',
+            status: (filter?.status as "all" | "completed" | "pending") ?? "",
             date: filter?.date || "",
         } as FilterValues,
 
@@ -165,9 +165,10 @@ export function TodoFilters() {
                             selector={(state) => ({
                                 canSubmit: state.canSubmit,
                                 isSubmitting: state.isSubmitting,
+                                isDirty: state.isDirty,
                             })}
                         >
-                            {({ canSubmit, isSubmitting }) => (
+                            {({ canSubmit, isSubmitting, isDirty }) => (
                                 <>
                                     <Button
                                         type="button"
@@ -185,7 +186,7 @@ export function TodoFilters() {
                                     <Button
                                         type="submit"
                                         className="w-full sm:w-auto px-8"
-                                        disabled={!canSubmit}
+                                        disabled={!canSubmit || !isDirty}
                                     >
                                         {isSubmitting ? "Applying..." : "Apply"}
                                     </Button>

@@ -32,7 +32,7 @@ function TodosLayout() {
   const [selectedTodo, setSelectedTodo] = useState<Todo | null>(null);
 
   const [search, setSearch] = useState("");
-  const [filter, setFilter] = useState<{ status?: string, date?: string }>({ status: "all", date: "" });
+  const [filter, setFilter] = useState<{ status?: string, date?: string }>({ status: "", date: "" });
 
   const createMutation = useMutation({
     ...createMutationOptions(queryClient),
