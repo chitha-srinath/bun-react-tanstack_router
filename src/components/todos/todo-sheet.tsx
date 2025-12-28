@@ -3,11 +3,14 @@ import { Button } from "@/components/ui/Button"
 import { Input } from "@/components/ui/Input"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/Label"
-
 import { useForm } from "@tanstack/react-form"
-
-import { z } from "zod"
+import { z } from "zod/v4"
 import type { Todo } from "@/lib/api/todos"
+
+const todoSchema = z.object({
+    title: z.string().min(1, "Title is required"),
+    description: z.string(),
+})
 
 interface TodoSheetProps {
     isOpen: boolean
@@ -21,6 +24,9 @@ export function TodoSheet({ isOpen, onClose, onSave, todo }: TodoSheetProps) {
         defaultValues: {
             title: todo?.title || "",
             description: todo?.description || "",
+        },
+        validators: {
+            onChange: todoSchema,
         },
         onSubmit: async ({ value }) => {
             await onSave(value)
@@ -59,10 +65,7 @@ export function TodoSheet({ isOpen, onClose, onSave, todo }: TodoSheetProps) {
                         <form.Field
                             name="title"
                             validators={{
-                                onChange: ({ value }) => {
-                                    const res = z.string().min(1, "Title is required").safeParse(value)
-                                    return res.success ? undefined : res.error.issues[0].message
-                                },
+                                // Field validation is handled by form schema
                             }}
                         >
                             {(field) => (
@@ -107,9 +110,13 @@ export function TodoSheet({ isOpen, onClose, onSave, todo }: TodoSheetProps) {
 
                     <SheetFooter className="pt-6 border-t mt-auto">
                         <form.Subscribe
-                            selector={(state) => [state.canSubmit, state.isSubmitting]}
+                            selector={(state) => ({
+                                canSubmit: state.canSubmit,
+                                isSubmitting: state.isSubmitting,
+                                values: state.values,
+                            })}
                         >
-                            {([canSubmit, isSubmitting]) => (
+                            {({ canSubmit, isSubmitting, values }) => (
                                 <>
                                     <Button
                                         type="button"
@@ -126,7 +133,7 @@ export function TodoSheet({ isOpen, onClose, onSave, todo }: TodoSheetProps) {
                                     <Button
                                         type="submit"
                                         className="w-full sm:w-auto px-8"
-                                        disabled={!canSubmit}
+                                        disabled={!canSubmit || (!todo && !values.title)}
                                     >
                                         {isSubmitting ? "Saving..." : todo ? "Update Task" : "Create Task"}
                                     </Button>
