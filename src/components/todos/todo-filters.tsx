@@ -12,7 +12,9 @@ import {
 import {
     Select,
     SelectContent,
+    SelectGroup,
     SelectItem,
+    SelectLabel,
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
@@ -44,7 +46,7 @@ export function TodoFilters() {
     const [isCalendarOpen, setIsCalendarOpen] = useState(false)
     const form = useForm({
         defaultValues: {
-            status: (filter?.status as "all" | "completed" | "pending") || "all",
+            status: (filter?.status as "all" | "completed" | "pending") ?? 'all',
             date: filter?.date || "",
         } as FilterValues,
 
@@ -98,13 +100,16 @@ export function TodoFilters() {
                                             )
                                         }
                                     >
-                                        <SelectTrigger id="status">
+                                        <SelectTrigger id="status" className="w-full">
                                             <SelectValue placeholder="Select status" />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="all">All</SelectItem>
-                                            <SelectItem value="completed">Completed</SelectItem>
-                                            <SelectItem value="pending">Pending</SelectItem>
+                                            <SelectGroup>
+                                                <SelectLabel>Status</SelectLabel>
+                                                <SelectItem value="all">All</SelectItem>
+                                                <SelectItem value="completed">Completed</SelectItem>
+                                                <SelectItem value="pending">Pending</SelectItem>
+                                            </SelectGroup>
                                         </SelectContent>
                                     </Select>
                                 </div>
