@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/Button"
 import { Input } from "@/components/ui/Input"
 import { useDebouncedCallback } from "@/hooks/use-debounce"
-import { Plus, Search } from "lucide-react"
+import { Filter, Plus, Search } from "lucide-react"
 import { useState } from "react"
 
 interface TodoHeaderProps {
@@ -31,11 +31,13 @@ export function TodoHeader({
 
     return (
         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <h1 className="text-2xl font-bold text-center md:text-left flex-shrink-0">
-                {title}
-            </h1>
+
 
             <div className="flex items-center gap-2">
+
+                <Button onClick={onCreate} size="sm" className="flex-shrink-0">
+                    <Plus className="mr-2 h-4 w-4" /> New Task
+                </Button>
                 <div className="flex-1 w-full md:max-w-md">
                     <div className="relative">
                         <Input
@@ -48,10 +50,11 @@ export function TodoHeader({
                     </div>
                 </div>
 
-                <Button onClick={onCreate} size="sm" className="flex-shrink-0">
-                    <Plus className="mr-2 h-4 w-4" /> New Task
-                </Button>
             </div>
+
+            <Button variant="outline" size="sm" className="flex-shrink-0">
+                <Filter className="mr-2 h-4 w-4" /> Filters
+            </Button>
 
         </div>
     )
