@@ -27,6 +27,7 @@ function TodosIndex() {
             onEdit={onEdit}
             onDelete={onDelete}
             onToggle={onToggle}
+            searchText={search ?? ""}
         />
     )
 }

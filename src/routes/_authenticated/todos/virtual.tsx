@@ -1,8 +1,8 @@
-import { createFileRoute, getRouteApi } from '@tanstack/react-router'
 import { TodoListVirtual } from '@/components/todos/todo-list-virtual'
 import { useTodosContext } from '@/components/todos/todos-context'
-import { useInfiniteQuery } from '@tanstack/react-query'
 import { todosQueryOptions } from '@/lib/query-options'
+import { useInfiniteQuery } from '@tanstack/react-query'
+import { createFileRoute, getRouteApi } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/_authenticated/todos/virtual')({
     component: TodosVirtual,
@@ -27,6 +27,7 @@ function TodosVirtual() {
             onEdit={onEdit}
             onDelete={onDelete}
             onToggle={onToggle}
+            searchText={search ?? ""}
         />
 
     )

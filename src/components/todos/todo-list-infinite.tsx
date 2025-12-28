@@ -1,7 +1,9 @@
-import { useEffect, useRef } from "react";
-import { type Todo } from "@/lib/api/todos";
-import { TodoCard, TodoCardSkeleton } from "./todo-card";
 import { Spinner } from "@/components/ui/Spinner";
+import { type Todo } from "@/lib/api/todos";
+import { FolderCode } from "lucide-react";
+import { useEffect, useRef } from "react";
+import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "../ui/empty";
+import { TodoCard, TodoCardSkeleton } from "./todo-card";
 
 interface TodoListInfiniteProps {
     todos: Todo[];
@@ -12,6 +14,7 @@ interface TodoListInfiniteProps {
     onEdit: (todo: Todo) => void;
     onDelete: (id: string) => void;
     onToggle: (id: string, newStatus: boolean) => void;
+    searchText: string
 }
 
 export function TodoListInfinite({
@@ -23,6 +26,7 @@ export function TodoListInfinite({
     onEdit,
     onDelete,
     onToggle,
+    searchText
 }: TodoListInfiniteProps) {
     const observerTarget = useRef<HTMLDivElement>(null);
 
@@ -47,7 +51,7 @@ export function TodoListInfinite({
         };
     }, [hasNextPage, fetchNextPage, isFetchingNextPage]);
 
-    if (isLoading && todos.length === 0) {
+    if (isLoading) {
         return (
             <div className="w-full h-full overflow-y-auto p-2">
                 <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 pb-4">
@@ -58,6 +62,39 @@ export function TodoListInfinite({
             </div>
         );
     }
+
+    if (searchText && todos.length === 0) {
+        return (
+            <Empty>
+                <EmptyHeader>
+                    <EmptyMedia variant="icon">
+                        <FolderCode />
+                    </EmptyMedia>
+                    <EmptyTitle>No Todos Found</EmptyTitle>
+                    <EmptyDescription>
+                        No todos found for the search term '{searchText.trim()}'.
+                    </EmptyDescription>
+                </EmptyHeader>
+            </Empty>
+        )
+    }
+    if (todos.length === 0) {
+        return (
+            <Empty>
+                <EmptyHeader>
+                    <EmptyMedia variant="icon">
+                        <FolderCode />
+                    </EmptyMedia>
+                    <EmptyTitle>No Todos Yet</EmptyTitle>
+                    <EmptyDescription>
+                        You haven&apos;t created any todos yet. Get started by creating
+                        your first todo.
+                    </EmptyDescription>
+                </EmptyHeader>
+            </Empty>
+        )
+    }
+
 
     return (
         <div className="w-full h-full overflow-y-auto p-2">
