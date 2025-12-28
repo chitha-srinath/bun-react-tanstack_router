@@ -91,10 +91,9 @@ export function TodoListVirtual({
             className="h-full w-full overflow-y-auto contain-strict scroll-smooth p-2"
         >
             <div
+                className="w-full relative"
                 style={{
                     height: `${rowVirtualizer.getTotalSize()}px`,
-                    width: "100%",
-                    position: "relative",
                 }}
             >
                 {rowVirtualizer.getVirtualItems().map((virtualRow) => {
@@ -107,13 +106,9 @@ export function TodoListVirtual({
                             data-index={virtualRow.index}
                             ref={rowVirtualizer.measureElement}
                             style={{
-                                position: "absolute",
-                                top: 0,
-                                left: 0,
-                                width: "100%",
                                 transform: `translateY(${virtualRow.start}px)`,
                             }}
-                            className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pb-4"
+                            className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pb-4 absolute w-full top-0 left-0"
                         >
                             {rowTodos.map((todo) => (
                                 <TodoCard
