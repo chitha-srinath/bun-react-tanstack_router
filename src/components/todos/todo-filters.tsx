@@ -9,6 +9,13 @@ import {
     SheetTitle,
     SheetTrigger,
 } from "@/components/ui/sheet"
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
 import { useForm } from "@tanstack/react-form"
 import { format } from "date-fns"
 import { Calendar as CalendarIcon, Filter } from "lucide-react"
@@ -30,11 +37,6 @@ const filterSchema = z.object({
 })
 
 type FilterValues = z.infer<typeof filterSchema>
-
-// interface TodoFiltersProps {
-//     filter?: { status?: string, date?: string }
-//     setFilter?: (filter: { status?: string, date?: string }) => void
-// }
 
 export function TodoFilters() {
     const { filter, setFilter } = useTodosContext()
@@ -88,20 +90,23 @@ export function TodoFilters() {
                                     <Label htmlFor="status">
                                         Status
                                     </Label>
-                                    <select
-                                        id="status"
+                                    <Select
                                         value={field.state.value}
-                                        onChange={(e) =>
+                                        onValueChange={(value) =>
                                             field.handleChange(
-                                                e.target.value as "all" | "completed" | "pending",
+                                                value as "all" | "completed" | "pending",
                                             )
                                         }
-                                        className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
                                     >
-                                        <option value="all">All</option>
-                                        <option value="completed">Completed</option>
-                                        <option value="pending">Pending</option>
-                                    </select>
+                                        <SelectTrigger id="status">
+                                            <SelectValue placeholder="Select status" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="all">All</SelectItem>
+                                            <SelectItem value="completed">Completed</SelectItem>
+                                            <SelectItem value="pending">Pending</SelectItem>
+                                        </SelectContent>
+                                    </Select>
                                 </div>
                             )}
                         />
@@ -165,11 +170,12 @@ export function TodoFilters() {
                                         onClick={() => {
                                             setOpen(false)
                                             form.reset()
+                                            setFilter({ status: '', date: '' })
                                         }}
                                         className="w-full sm:w-auto bg-transparent"
                                         disabled={isSubmitting}
                                     >
-                                        Cancel
+                                        Clear
                                     </Button>
                                     <Button
                                         type="submit"
