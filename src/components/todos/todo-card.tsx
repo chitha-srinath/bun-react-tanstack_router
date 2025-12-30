@@ -109,7 +109,7 @@ export function TodoCard({ todo, onEdit, onDelete, onToggle }: TodoCardProps) {
                     <motion.div
                         initial={{ width: 0 }}
                         animate={{ width: "100%" }}
-                        className="absolute bottom-0 left-0 h-0.5 bg-primary/40"
+                        className="absolute bottom-0 left-0 h-0.5 bg-green-400"
                     />
                 )}
             </Card>
