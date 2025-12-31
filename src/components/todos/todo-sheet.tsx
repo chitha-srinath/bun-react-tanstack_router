@@ -70,8 +70,8 @@ export function TodoSheet({ isOpen, onClose, onSave, todo }: TodoSheetProps) {
                         >
                             {(field) => (
                                 <div className="grid gap-2">
-                                    <Label htmlFor={field.name} className="text-sm font-semibold">
-                                        Title
+                                    <Label htmlFor={field.name} className="text-sm font-semibold flex gap-0.5">
+                                        Title<span className="text-red-500">*</span>
                                     </Label>
                                     <Input
                                         id={field.name}
@@ -83,7 +83,7 @@ export function TodoSheet({ isOpen, onClose, onSave, todo }: TodoSheetProps) {
                                         className="focus-visible:ring-primary"
                                     />
                                     {field.state.meta.isTouched && field.state.meta.errors.length ? (
-                                        <em className="text-red-500 text-xs">{field.state.meta.errors.join(", ")}</em>
+                                        <em className="text-red-500 text-xs">{field.state.meta.errors[0]?.message}</em>
                                     ) : null}
                                 </div>
                             )}
