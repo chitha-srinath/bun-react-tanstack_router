@@ -96,6 +96,7 @@ function ResetPassword() {
                       onChange={(e) => field.handleChange(e.target.value)}
                       onCopy={(e) => e.preventDefault()}
                       onPaste={(e) => e.preventDefault()}
+                      className="pr-10"
                     />
                     <Button
                       type="button"
@@ -136,6 +137,7 @@ function ResetPassword() {
                       onChange={(e) => field.handleChange(e.target.value)}
                       onCopy={(e) => e.preventDefault()}
                       onPaste={(e) => e.preventDefault()}
+                      className="pr-10"
                     />
                     <Button
                       type="button"
