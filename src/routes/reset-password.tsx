@@ -109,7 +109,7 @@ function ResetPassword() {
                       )}
                     </Button>
                   </div>
-                  {field.state.meta.isTouched && field.state.meta.errors.length ? (
+                  {field.state.meta.isBlurred && field.state.meta.errors.length ? (
                     <p className="text-sm text-destructive">
                       {field.state.meta.errors[0]?.message}
                     </p>
@@ -145,7 +145,7 @@ function ResetPassword() {
                       )}
                     </Button>
                   </div>
-                  {field.state.meta.isTouched && field.state.meta.errors.length ? (
+                  {field.state.meta.isBlurred && field.state.meta.errors.length ? (
                     <p className="text-sm text-destructive">
                       {field.state.meta.errors[0]?.message}
                     </p>
