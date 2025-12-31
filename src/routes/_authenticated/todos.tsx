@@ -7,22 +7,8 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Link, Outlet } from "@tanstack/react-router";
 import { useCallback, useState } from "react";
 
-// type TodosSearch = {
-//   search?: string;
-//   filter?: {
-//     status?: string;
-//     date?: string;
-//   };
-// };
-
 export const Route = createFileRoute("/_authenticated/todos")({
   component: TodosLayout,
-  //   validateSearch: (search: Record<string, unknown>): TodosSearch => {
-  //     return {
-  //       search: (search.search as string) || "",
-  //       filter: (search.filter as TodosSearch["filter"]) || { status: "all", date: "" },
-  //     };
-  //   },
 });
 
 
