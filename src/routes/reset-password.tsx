@@ -1,5 +1,5 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
-import { z } from "zod";
+import { z } from "zod/v4";
 import { useForm } from "@tanstack/react-form";
 import {
   Card,
@@ -94,6 +94,8 @@ function ResetPassword() {
                       value={field.state.value}
                       onBlur={field.handleBlur}
                       onChange={(e) => field.handleChange(e.target.value)}
+                      onCopy={(e) => e.preventDefault()}
+                      onPaste={(e) => e.preventDefault()}
                     />
                     <Button
                       type="button"
@@ -110,9 +112,11 @@ function ResetPassword() {
                     </Button>
                   </div>
                   {field.state.meta.isBlurred && field.state.meta.errors.length ? (
-                    <p className="text-sm text-destructive">
-                      {field.state.meta.errors[0]?.message}
-                    </p>
+                    <ul className="text-sm text-destructive list-inside list-disc">
+                      {field.state.meta.errors.map((error, i) => (
+                        <li key={i}>{error?.message}</li>
+                      ))}
+                    </ul>
                   ) : null}
                 </div>
               )}
@@ -130,6 +134,8 @@ function ResetPassword() {
                       value={field.state.value}
                       onBlur={field.handleBlur}
                       onChange={(e) => field.handleChange(e.target.value)}
+                      onCopy={(e) => e.preventDefault()}
+                      onPaste={(e) => e.preventDefault()}
                     />
                     <Button
                       type="button"
