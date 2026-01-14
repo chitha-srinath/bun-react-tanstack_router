@@ -38,7 +38,7 @@ function RootComponent() {
     <>
       <div className="flex flex-col h-screen overflow-hidden">
         <Header />
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1">
           <Outlet />
         </div>
       </div>

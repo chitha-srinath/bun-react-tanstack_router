@@ -27,7 +27,7 @@ function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-100 via-purple-50 to-pink-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 p-4">
+    <div className="flex items-center justify-center bg-gradient-to-br from-indigo-100 via-purple-50 to-pink-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 p-4 h-full">
       <div className="w-full max-w-md animate-in fade-in zoom-in duration-500">
         {/* <div className="text-center mb-8">
           <h1 className="text-4xl font-bold tracking-tight text-gray-900 dark:text-white mb-2">
